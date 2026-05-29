@@ -1,3 +1,25 @@
+/kubectl
+/kind
+/argocd
+
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+
+*.test
+
+node_modules/
+.env
+
 # Local .terraform directories
 .terraform/
 
