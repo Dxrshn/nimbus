@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: nimbus
+      POSTGRES_PASSWORD: nimbus-local-dev
+      POSTGRES_DB: nimbus
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  localstack:
+    image: localstack/localstack:3
+    environment:
+      SERVICES: s3,sqs
+      DEFAULT_REGION: ap-south-1
+      AWS_DEFAULT_REGION: ap-south-1
+    ports:
+      - "4566:4566"
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - ./scripts/localstack-init.sh:/etc/localstack/init/ready.d/init.sh
+
+volumes:
+  postgres_data:
+  localstack_data:
