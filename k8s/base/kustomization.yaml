@@ -9,3 +9,4 @@ resources:
   - analytics-worker/deployment.yaml
   - dashboard-ui/deployment.yaml
   - dashboard-ui/service.yaml
+  - ingress/ingress.yaml
