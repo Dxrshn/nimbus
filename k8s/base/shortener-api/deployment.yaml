@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shortener-api
+  labels:
+    app: shortener-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shortener-api
+  template:
+    metadata:
+      labels:
+        app: shortener-api
+    spec:
+      containers:
+        - name: shortener-api
+          image: nimbus/shortener-api:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: nimbus-secrets
+                  key: database-url
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: nimbus-secrets
+                  key: redis-url
+            - name: SQS_QUEUE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: nimbus-secrets
+                  key: sqs-queue-url
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10

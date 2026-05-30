@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - shortener-api/deployment.yaml
+  - shortener-api/service.yaml
+  - redirect-svc/deployment.yaml
+  - redirect-svc/service.yaml
+  - analytics-worker/deployment.yaml
+  - dashboard-ui/deployment.yaml
+  - dashboard-ui/service.yaml
