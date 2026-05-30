@@ -6,19 +6,32 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dxrshn/nimbus/redirect-svc/internal/cache"
 	"github.com/dxrshn/nimbus/redirect-svc/internal/publisher"
-	"github.com/dxrshn/nimbus/redirect-svc/internal/store"
 )
 
+type Storer interface {
+	GetOriginalURL(ctx context.Context, shortCode string) (string, error)
+	IncrementClickCount(ctx context.Context, shortCode string)
+}
+
+type Cacher interface {
+	Get(ctx context.Context, shortCode string) (string, error)
+	Set(ctx context.Context, shortCode, originalURL string)
+	Ping(ctx context.Context) error
+}
+
+type Publisher interface {
+	Publish(ctx context.Context, event publisher.ClickEvent)
+}
+
 type Handler struct {
-	pg     *store.Postgres
-	cache  *cache.Redis
-	pub    *publisher.SQS
+	pg     Storer
+	cache  Cacher
+	pub    Publisher
 	logger *slog.Logger
 }
 
-func New(pg *store.Postgres, cache *cache.Redis, pub *publisher.SQS, logger *slog.Logger) *Handler {
+func New(pg Storer, cache Cacher, pub Publisher, logger *slog.Logger) *Handler {
 	return &Handler{pg: pg, cache: cache, pub: pub, logger: logger}
 }
 
