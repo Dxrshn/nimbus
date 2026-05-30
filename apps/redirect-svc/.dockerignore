@@ -1,1 +1,3 @@
-.gitkeep
+*_test.go
+*.md
+.env
