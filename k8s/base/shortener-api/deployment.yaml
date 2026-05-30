@@ -35,6 +35,11 @@ spec:
                 secretKeyRef:
                   name: nimbus-secrets
                   key: sqs-queue-url
+            - name: OTLP_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: nimbus-secrets
+                  key: otlp-endpoint
           livenessProbe:
             httpGet:
               path: /health

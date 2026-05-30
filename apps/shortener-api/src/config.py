@@ -10,5 +10,6 @@ class Settings(BaseSettings):
     aws_default_region: str = "ap-south-1"
     aws_access_key_id: str = "test"
     aws_secret_access_key: str = "test"
+    otlp_endpoint: str = "http://localhost:4317"
 
 settings = Settings()
