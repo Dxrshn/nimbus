@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: localstack-init
+data:
+  init.sh: |
+    #!/bin/bash
+    awslocal sqs create-queue --queue-name click-events --region ap-south-1

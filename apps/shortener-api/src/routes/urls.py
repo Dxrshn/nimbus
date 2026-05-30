@@ -13,7 +13,7 @@ from src.services.url_service import (
     get_url_by_short_code,
 )
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter(prefix="/v1")
 
 
 @router.post("/shorten", response_model=ShortenResponse, status_code=201)
@@ -24,7 +24,7 @@ async def shorten_url(
 ):
     base_url = str(request.base_url).rstrip("/")
     result = await create_short_url(str(payload.url), base_url, db)
-    await set_cached_url(result["short_code"], {"original_url": str(payload.url)})
+    await set_cached_url(result["short_code"], str(payload.url))
     return result
 
 

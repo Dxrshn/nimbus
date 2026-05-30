@@ -1,5 +1,3 @@
-import json
-
 import redis.asyncio as redis
 
 from src.config import settings
@@ -14,17 +12,14 @@ def get_redis() -> redis.Redis:
     return _client
 
 
-async def get_cached_url(short_code: str) -> dict | None:
+async def get_cached_url(short_code: str) -> str | None:
     client = get_redis()
-    data = await client.get(f"url:{short_code}")
-    if data:
-        return json.loads(data)
-    return None
+    return await client.get(f"url:{short_code}")
 
 
-async def set_cached_url(short_code: str, url_data: dict, ttl: int = 3600) -> None:
+async def set_cached_url(short_code: str, url: str, ttl: int = 3600) -> None:
     client = get_redis()
-    await client.set(f"url:{short_code}", json.dumps(url_data), ex=ttl)
+    await client.set(f"url:{short_code}", url, ex=ttl)
 
 
 async def delete_cached_url(short_code: str) -> None:
