@@ -1,0 +1,90 @@
+name: CI — Applications
+on:
+  push:
+    branches: [main, develop]
+    paths: ['apps/**']
+  pull_request:
+    branches: [main]
+    paths: ['apps/**']
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      shortener-api: ${{ steps.filter.outputs.shortener-api }}
+      redirect-svc: ${{ steps.filter.outputs.redirect-svc }}
+      analytics-worker: ${{ steps.filter.outputs.analytics-worker }}
+      dashboard-ui: ${{ steps.filter.outputs.dashboard-ui }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            shortener-api:
+              - 'apps/shortener-api/**'
+            redirect-svc:
+              - 'apps/redirect-svc/**'
+            analytics-worker:
+              - 'apps/analytics-worker/**'
+            dashboard-ui:
+              - 'apps/dashboard-ui/**'
+
+  test-shortener-api:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.shortener-api == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          cd apps/shortener-api
+          pip install -r requirements.txt
+          python -m pytest tests/ -v
+
+  test-redirect-svc:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.redirect-svc == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+      - run: |
+          cd apps/redirect-svc
+          go test ./... -v
+
+  build-shortener-api:
+    needs: [detect-changes, test-shortener-api]
+    if: needs.detect-changes.outputs.shortener-api == 'true'
+    uses: ./.github/workflows/reusable/docker-build.yml
+    with:
+      service_name: shortener-api
+      context: apps/shortener-api
+
+  build-redirect-svc:
+    needs: [detect-changes, test-redirect-svc]
+    if: needs.detect-changes.outputs.redirect-svc == 'true'
+    uses: ./.github/workflows/reusable/docker-build.yml
+    with:
+      service_name: redirect-svc
+      context: apps/redirect-svc
+
+  build-analytics-worker:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.analytics-worker == 'true'
+    uses: ./.github/workflows/reusable/docker-build.yml
+    with:
+      service_name: analytics-worker
+      context: apps/analytics-worker
+
+  build-dashboard-ui:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.dashboard-ui == 'true'
+    uses: ./.github/workflows/reusable/docker-build.yml
+    with:
+      service_name: dashboard-ui
+      context: apps/dashboard-ui
