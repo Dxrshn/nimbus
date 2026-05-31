@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-platform
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  platform-overview.json: |
+    {
+      "title": "Nimbus Platform Overview",
+      "uid": "nimbus-platform",
+      "schemaVersion": 36,
+      "refresh": "30s",
+      "panels": [
+        {
+          "id": 1,
+          "title": "Request Rate",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+          "targets": [{
+            "expr": "sum(rate(http_requests_total[5m])) by (service)",
+            "legendFormat": "{{ service }}"
+          }]
+        },
+        {
+          "id": 2,
+          "title": "Error Rate %",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+          "targets": [{
+            "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) by (service) / sum(rate(http_requests_total[5m])) by (service) * 100",
+            "legendFormat": "{{ service }}"
+          }]
+        },
+        {
+          "id": 3,
+          "title": "P99 Latency",
+          "type": "timeseries",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+          "targets": [{
+            "expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "p99"
+          }]
+        },
+        {
+          "id": 4,
+          "title": "URLs Shortened (total)",
+          "type": "stat",
+          "gridPos": {"h": 8, "w": 6, "x": 12, "y": 8},
+          "targets": [{
+            "expr": "sum(urls_created_total)",
+            "legendFormat": "URLs"
+          }]
+        },
+        {
+          "id": 5,
+          "title": "Redirects (total)",
+          "type": "stat",
+          "gridPos": {"h": 8, "w": 6, "x": 18, "y": 8},
+          "targets": [{
+            "expr": "sum(redirect_requests_total)",
+            "legendFormat": "Redirects"
+          }]
+        }
+      ]
+    }
