@@ -1,0 +1,19 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: restrict-image-registries
+spec:
+  validationFailureAction: Audit
+  rules:
+    - name: allowed-registries
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: [nimbus]
+      validate:
+        message: "Images must come from allowed registries"
+        pattern:
+          spec:
+            containers:
+              - image: "ghcr.io/* | docker.io/library/* | registry.k8s.io/*"

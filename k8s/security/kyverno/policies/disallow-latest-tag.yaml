@@ -1,0 +1,19 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-latest-tag
+spec:
+  validationFailureAction: Audit
+  rules:
+    - name: deny-latest
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: [nimbus]
+      validate:
+        message: "Using ':latest' tag is not allowed"
+        pattern:
+          spec:
+            containers:
+              - image: "!*:latest"

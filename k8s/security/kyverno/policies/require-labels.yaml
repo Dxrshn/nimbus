@@ -1,0 +1,20 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-labels
+spec:
+  validationFailureAction: Audit
+  rules:
+    - name: require-app-and-version
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: [nimbus]
+      validate:
+        message: "Pods must have 'app' and 'version' labels"
+        pattern:
+          metadata:
+            labels:
+              app: "?*"
+              version: "?*"
