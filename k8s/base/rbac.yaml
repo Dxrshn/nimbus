@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: shortener-api
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: redirect-svc
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: analytics-worker
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dashboard-ui
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: nimbus-app
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: nimbus-app
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: nimbus-app
+subjects:
+  - kind: ServiceAccount
+    name: shortener-api
+  - kind: ServiceAccount
+    name: redirect-svc
+  - kind: ServiceAccount
+    name: analytics-worker
+  - kind: ServiceAccount
+    name: dashboard-ui

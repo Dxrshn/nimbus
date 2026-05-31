@@ -10,3 +10,5 @@ resources:
   - dashboard-ui/deployment.yaml
   - dashboard-ui/service.yaml
   - ingress/ingress.yaml
+  - network-policies.yaml
+  - rbac.yaml
