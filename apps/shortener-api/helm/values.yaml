@@ -1,0 +1,34 @@
+replicaCount: 1
+
+image:
+  repository: nimbus/shortener-api
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  port: 80
+  targetPort: 8000
+
+env:
+  databaseUrl: ""
+  redisUrl: ""
+  sqsQueueUrl: ""
+  otlpEndpoint: ""
+
+secretName: nimbus-secrets
+
+livenessProbe:
+  path: /health
+  port: 8000
+
+readinessProbe:
+  path: /ready
+  port: 8000
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
